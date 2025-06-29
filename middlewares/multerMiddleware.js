@@ -1,5 +1,5 @@
+const jwt = require('jsonwebtoken')
 require('dotenv').config();
-const jwt = require('jasonwebtoken')
 
 exports.authMiddleware = async (req, res, next) => {
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -7,6 +7,7 @@ exports.authMiddleware = async (req, res, next) => {
             const token = req.headers.authorization.split('')[1]
             const decode = jwt.verify(token, process.env.JWT_SECRET)
             req.user = decode
+            console.log("Decode: ", decode)
             next();
         } catch (err) {
             return res.status(401).send({ message: 'Invalid token, not authorized' })
