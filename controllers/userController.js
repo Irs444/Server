@@ -1,6 +1,8 @@
 const User = require("../models/userModal")
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const { generateOTP } = require("../utils/otpGenerator")
+const { sendOTPEmail } = require("../services/emailService")
 require('dotenv').config()
 
 const addEmployee = async (req, res) => {
@@ -69,10 +71,41 @@ const login = async (req, res) => {
 
 const forgetPassword = async (req, res) => {
     try {
+        const { email } = req.body
+        if (email == '') return res.status(400).send({ message: 'Field cannot be empty' })
+        const user = await User.findOne({ email })
+        if (!user) return res.status(400).send({ message: 'User not found' })
+        const otp = generateOTP();
+        const otpExpire = new Date(Date.now() + 10 * 60 * 1000) // otp expire in 10 minute.
 
+        user.otp = otp;
+        user.otpExpire = otpExpire;
+        await user.save();
+
+        await sendOTPEmail(email, otp)
+
+        return res.status(200).send({ message: 'OTP send to your email', otp })
     } catch (err) {
         return res.status(500).send({ message: err.message })
     }
 }
 
-module.exports = { addEmployee, login }
+const resetPassword = async (req, res) => {
+    try {
+        const { otp, newPassword, confirmNewPassword } = req.body
+        if (newPassword !== confirmNewPassword) return res.status(400).send({ message: 'Password do not match' })
+        const user = await User.findOne({ otp, otpExpire: { $gt: Date.now() } })
+        if (!user || user.otp !== otp) return res.status(400).send({ message: 'Invalide or expired OTP' })
+
+        user.password = newPassword;
+        user.otp = undefined;
+        user.otpExpire = undefined;
+
+        await user.save();
+        return res.status(200).send({ message: 'Password reset successfully' })
+    } catch (err) {
+        return res.status(500).send({ message: err.message })
+    }
+}
+
+module.exports = { addEmployee, login, forgetPassword, resetPassword }

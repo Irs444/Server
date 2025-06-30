@@ -5,6 +5,8 @@ const userSchema = new mongoose.Schema({
     name: { type: String, require: true },
     email: { type: String, require: true },
     password: { type: String, require: true },
+    otp: { type: String },
+    otpExpire: { type: Date },
     role: { type: String, enum: ['employee', 'manager', 'admin'], default: 'employee' },
     level: { type: Number, enum: [1, 2, 3], default: 3 },
     reportsTo: { type: mongoose.Schema.Types.ObjectId, ref: 'users', default: null },
