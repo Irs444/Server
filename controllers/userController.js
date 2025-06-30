@@ -74,7 +74,7 @@ const forgetPassword = async (req, res) => {
         const { email } = req.body
         if (email == '') return res.status(400).send({ message: 'Field cannot be empty' })
         const user = await User.findOne({ email })
-        if (!user) return res.status(400).send({ message: 'User not found' })
+        if (!user) return res.status(400).send({ message: 'User not found with this email' })
         const otp = generateOTP();
         const otpExpire = new Date(Date.now() + 10 * 60 * 1000) // otp expire in 10 minute.
 

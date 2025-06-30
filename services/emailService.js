@@ -2,19 +2,22 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
-    service: 'email',
-    auth: {
-        user: process.env.EMAIL,
-        pass: process.env.PASSWORD
-    }
+  service: 'email',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.PASSWORD
+  }
 })
 
 const sendOTPEmail = async (email, otp) => {
-    const mailOption = {
-        from: process.env.EMAIL,
-        to: email,
-        subject: 'Password Reset OTP',
-        html: `
+  const mailOption = {
+    from: process.env.EMAIL,
+    to: email,
+    subject: 'Password Reset OTP',
+    html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0;">
         <h2 style="color: #333;">Password Reset Request</h2>
         <p style="font-size: 16px; color: #555;">
@@ -31,9 +34,9 @@ const sendOTPEmail = async (email, otp) => {
         </p>
       </div>
     `
-    }
+  }
 
-    await transporter.sendMail(mailOption)
+  await transporter.sendMail(mailOption)
 }
 
 module.exports = { sendOTPEmail }
