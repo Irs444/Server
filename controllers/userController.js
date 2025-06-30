@@ -14,7 +14,7 @@ const addEmployee = async (req, res) => {
             return res.status(403).send({ message: 'Only admin can create admin and manager' })
         }
 
-        const existEmail = await User.findOne({email})
+        const existEmail = await User.findOne({ email })
         if (existEmail) return res.status(400).send({ message: 'Email already exist' })
 
         // validate reporting to
@@ -51,7 +51,7 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body
         if (email == '' || password == '') return res.status(400).send({ message: 'Fields cannot be empty' })
-        const user = await User.findOne({email})
+        const user = await User.findOne({ email })
         if (!user) return res.status(400).send({ message: 'Email not register' })
         const comparePassword = await bcrypt.compare(password, user.password)
         if (!comparePassword) return res.status(400).send({ message: 'Password not matched' })
@@ -67,4 +67,12 @@ const login = async (req, res) => {
     }
 }
 
-module.exports = { addEmployee , login}
+const forgetPassword = async (req, res) => {
+    try {
+
+    } catch (err) {
+        return res.status(500).send({ message: err.message })
+    }
+}
+
+module.exports = { addEmployee, login }
