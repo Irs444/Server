@@ -13,6 +13,7 @@ const app = express()
 const departmentRouter = require('./routers/departmentRouter')
 const userRouter = require('./routers/userRouter')
 const User = require('./models/userModal')
+const Department = require('./models/departmentModal')
 
 // middleware
 app.use(express.json());
@@ -41,6 +42,21 @@ connectDB(process.env.DATABASE_URL).then(async () => {
         console.log('Admin created', admin.email)
     }
 })
+
+// seed department dummy data
+const dummyData = Array.from({ length: 50 }, (_, i) => ({
+    name: `Department ${i + 1}`
+}))
+
+const addDepartment = async () => {
+    const count = await Department.countDocuments();
+    if (count == 0) {
+        await Department.insertMany(dummyData)
+        console.log("Department data added")
+    }
+}
+
+addDepartment();
 
 // routes
 app.use("/api/v1/department", departmentRouter)
