@@ -10,8 +10,9 @@ const connectDB = require('./config/db')
 const cors = require('cors')
 const app = express()
 
-const departmentRouter = require('./routers/departmentRouter')
 const userRouter = require('./routers/userRouter')
+const departmentRouter = require('./routers/departmentRouter')
+const designationRouter = require('./routers/designationRouter')
 const User = require('./models/userModal')
 const Department = require('./models/departmentModal')
 
@@ -61,6 +62,7 @@ addDepartment();
 // routes
 app.use("/api/v1/department", departmentRouter)
 app.use('/api/v1/user', userRouter)
+app.use("/api/v1/designation", designationRouter)
 
 const port = process.env.PORT || 5000
 app.listen(port, () => console.log(`server started at port http://localhost:${port} in ${process.env.NODE_ENV} mode`))
