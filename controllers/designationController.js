@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Designation = require("../models/designationModal");
 
 const addDesignation = async (req, res) => {
@@ -22,7 +23,20 @@ const getAllDesignation = async (req, res) => {
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit
 
+        // for filter and search
+        const { departmentId, search } = req.query;
+        const matchStage = {};
+
+        if (departmentId && mongoose.Types.ObjectId.isValid(departmentId)) {
+            matchStage.departmentId = new mongoose.Types.ObjectId(departmentId);
+        }
+
+        if (search) {
+            matchStage.name = { $regex: search, $options: 'i' }; // case sensitive
+        }
+
         const totalCount = await Designation.aggregate([
+            { $match: matchStage },
             {
                 $lookup: {
                     from: 'departments',
@@ -37,6 +51,7 @@ const getAllDesignation = async (req, res) => {
 
         const total = totalCount[0]?.total || 0;
         const data = await Designation.aggregate([
+            { $match: matchStage },
             {
                 $lookup: {
                     from: 'departments',
