@@ -46,7 +46,7 @@ const getAllDesignation = async (req, res) => {
                 }
             },
             { $unwind: '$Department' },
-            { $sort: -1 },
+            { $sort: { createdAt: -1 } },
             { $skip: skip },
             { $limit: limit }
         ])
