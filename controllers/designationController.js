@@ -10,10 +10,57 @@ const addDesignation = async (req, res) => {
         if (designation) return res.status(400).send({ message: 'Designation already exist' })
         const newDesignation = new Designation({ name, departmentId })
         await newDesignation.save();
-        return res.status(201).send({ message: 'Designation created successfully' })
+        return res.status(201).send({ message: 'Designation created successfully', newDesignation })
     } catch (err) {
         return res.status(500).send({ message: err.message })
     }
 }
 
-module.exports = { addDesignation }
+const getAllDesignation = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit
+
+        const totalCount = await Designation.aggregate([
+            {
+                $lookup: {
+                    from: 'departments',
+                    localField: 'departmentId',
+                    foreignField: '_id',
+                    as: 'Department'
+                }
+            },
+            { $unwind: '$Department' },
+            { $count: 'total' }
+        ]);
+
+        const total = totalCount[0]?.total || 0;
+        const data = await Designation.aggregate([
+            {
+                $lookup: {
+                    from: 'departments',
+                    localField: 'departmentId',
+                    foreignField: '_id',
+                    as: 'Department'
+                }
+            },
+            { $unwind: '$Department' },
+            { $sort: -1 },
+            { $skip: skip },
+            { $limit: limit }
+        ])
+
+        return res.status(200).send({
+            message: 'Fetch all designation successfully',
+            page,
+            total,
+            pages: Math.ceil(total / limit),
+            data
+        })
+    } catch (err) {
+        return res.status(500).send({ message: err.message })
+    }
+}
+
+module.exports = { addDesignation, getAllDesignation }
