@@ -1,4 +1,5 @@
 const Department = require("../models/departmentModal")
+const Designation = require("../models/designationModal")
 
 const addDepartment = async (req, res) => {
     try {
@@ -54,4 +55,18 @@ const updateDepartment = async (req, res) => {
     }
 }
 
-module.exports = { addDepartment, getAllDepartment, updateDepartment }
+const deleteDepartment = async (req, res) => {
+    try {
+        const { id } = req.params
+        const currentUser = req.user
+        if (currentUser.role !== 'admin') return res.status(403).send({ message: 'Access denied. Only admin can delete department' })
+        const designation = await Designation.findById(id)
+        if (designation) return res.status(400).send({ message: 'Access denied. Department already exist with designation' })
+        await Department.findByIdAndDelete(id)
+        return res.status(200).send({ message: 'Department delete successfully' })
+    } catch (err) {
+        return res.status(500).send({ message: err.message })
+    }
+}
+
+module.exports = { addDepartment, getAllDepartment, updateDepartment, deleteDepartment }
