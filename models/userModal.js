@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
     level: { type: Number, enum: [1, 2, 3], default: 3 },
     reportsTo: { type: mongoose.Schema.Types.ObjectId, ref: 'users', default: null },
     department: { type: mongoose.Schema.Types.ObjectId, ref: 'departments' },
-    position: { type: String },
+    designation: { type: mongoose.Schema.Types.ObjectId, ref: 'designations' },
     isActive: { type: Boolean, default: true }
 
 }, { timestamps: true })

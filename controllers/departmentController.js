@@ -60,8 +60,10 @@ const deleteDepartment = async (req, res) => {
         const { id } = req.params
         const currentUser = req.user
         if (currentUser.role !== 'admin') return res.status(403).send({ message: 'Access denied. Only admin can delete department' })
-        const designation = await Designation.findById(id)
-        if (designation) return res.status(400).send({ message: 'Access denied. Department already exist with designation' })
+
+        // chech if any designation exist with this department
+        const designation = await Designation.find({ departmentId: id })
+        if (designation.length > 0) return res.status(400).send({ message: 'Access denied. Department has existing designation' })
         await Department.findByIdAndDelete(id)
         return res.status(200).send({ message: 'Department delete successfully' })
     } catch (err) {

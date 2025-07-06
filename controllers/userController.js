@@ -8,7 +8,7 @@ require('dotenv').config()
 const addEmployee = async (req, res) => {
     try {
         const currentUser = req.user
-        const { name, email, password, role, level, reportsTo, department, position } = req.body
+        const { name, email, password, role, level, reportsTo, department, designation } = req.body
 
         // check permission
         if (currentUser.role == 'employee') return res.status(403).send({ message: 'Access denied. Employee cannot create user' })
@@ -37,7 +37,7 @@ const addEmployee = async (req, res) => {
             level,
             reportsTo: reportingManager ? reportingManager._id : null,
             department,
-            position
+            designation
         })
 
         await newEmployee.save();
