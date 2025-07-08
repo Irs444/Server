@@ -4,6 +4,6 @@ const { authMiddleware } = require('../middlewares/multerMiddleware');
 const router = express.Router();
 
 router.post("/add", authMiddleware, addCredit)
-router.post("/list", authMiddleware, getAllCredit)
+router.get("/list", authMiddleware, getAllCredit)
 
 module.exports = router
