@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Credit = require("../models/creditModal");
 
 const addCredit = async (req, res) => {
@@ -31,4 +32,61 @@ const addCredit = async (req, res) => {
     }
 }
 
-module.exports = { addCredit }
+const getAllCredit = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        // for filter and search
+        const { employeeId } = req.query;
+        const matchStage = {};
+
+        if (employeeId && mongoose.Types.ObjectId.isValid(employeeId)) {
+            matchStage.employeeId = new mongoose.Types.ObjectId(employeeId)
+        }
+
+        const totalCount = await Credit.aggregate([
+            { $match: matchStage },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: "employeeId",
+                    foreignField: "_id",
+                    as: "User"
+                }
+            },
+            { $unwind: '$User' },
+            { $count: 'total' }
+        ]);
+
+        const total = totalCount[0]?.total || 0;
+        const data = await Credit.aggregate([
+            { $match: matchStage },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: "employeeId",
+                    foreignField: "_id",
+                    as: "User"
+                }
+            },
+            { $unwind: '$User' },
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit }
+        ])
+
+        return res.status(200).send({
+            message: 'Credit fetch successfully',
+            page,
+            total,
+            pages: Math.ceil(total / limit),
+            data
+        })
+    } catch (err) {
+        return res.status(500).send({ message: err.message })
+    }
+}
+
+module.exports = { addCredit, getAllCredit }
