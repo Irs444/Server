@@ -13,6 +13,8 @@ const app = express()
 const userRouter = require('./routers/userRouter')
 const departmentRouter = require('./routers/departmentRouter')
 const designationRouter = require('./routers/designationRouter')
+const creditRouter = require('./routers/creditRouter')
+
 const User = require('./models/userModal')
 const Department = require('./models/departmentModal')
 
@@ -63,6 +65,7 @@ addDepartment();
 app.use("/api/v1/department", departmentRouter)
 app.use('/api/v1/user', userRouter)
 app.use("/api/v1/designation", designationRouter)
+app.use("/api/v1/credit", creditRouter)
 
 const port = process.env.PORT || 5000
 app.listen(port, () => console.log(`server started at port http://localhost:${port} in ${process.env.NODE_ENV} mode`))
